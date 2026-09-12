@@ -39,6 +39,7 @@ public class Main {
                 try {
                     taskManager.addTask(title);
                     System.out.println("任务添加成功");
+                    saveTasks(taskManager, taskFileStorage);
                 } catch (IllegalArgumentException e) {
                     System.out.println("添加失败！");
                     System.out.println(e.getMessage());
@@ -58,6 +59,7 @@ public class Main {
                     int taskId = Integer.parseInt(taskNumberText);
                     if (taskManager.markTaskCompleted(taskId)) {
                         System.out.println("已完成任务！");
+                        saveTasks(taskManager, taskFileStorage);
                     } else {
                         System.out.println("任务编号不存在");
                     }
@@ -71,6 +73,7 @@ public class Main {
                     int taskId = Integer.parseInt(taskDeleteNumberText);
                     if (taskManager.deleteTask(taskId)) {
                         System.out.println("任务已删除！");
+                        saveTasks(taskManager, taskFileStorage);
                     } else {
                         System.out.println("任务编号不存在");
                     }
@@ -85,6 +88,7 @@ public class Main {
                 }
                 else{
                     System.out.println("已删除"+deleteNum+"个已完成任务");
+                    saveTasks(taskManager, taskFileStorage);
                 }
             }
             else if(choice.equals("6")){
@@ -101,19 +105,23 @@ public class Main {
                 }
             }
             else if (choice.equals("0")) {
-                try {
-                    taskFileStorage.save(taskManager.getAllTasks());
-                    System.out.println("保存成功！");
-                } catch (IOException e) {
-                    System.out.println("保存失败！");
-                }
+                saveTasks(taskManager, taskFileStorage);
                 System.out.println("已退出");
-
                 break;
             } else {
                 System.out.println("无效选项");
             }
         }
         scanner.close();
+    }
+    private static void saveTasks(
+            TaskManager taskManager,
+            TaskFileStorage taskFileStorage
+    ) {
+        try {
+            taskFileStorage.save(taskManager.getAllTasks());
+        } catch (IOException e) {
+            System.out.println("自动保存失败：" + e.getMessage());
+        }
     }
 }
