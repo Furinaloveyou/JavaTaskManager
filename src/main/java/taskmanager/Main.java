@@ -19,6 +19,8 @@ public class Main {
             );
         } catch (IOException e) {
             System.out.println("任务加载失败：" + e.getMessage());
+            System.out.println("为避免覆盖原数据，程序已停止");
+            return;
         }
         Scanner scanner = new Scanner(System.in);
         while (true) {
