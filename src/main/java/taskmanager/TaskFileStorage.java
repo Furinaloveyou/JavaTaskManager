@@ -1,6 +1,9 @@
 package taskmanager;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +18,22 @@ public class TaskFileStorage {
 
     //存数据
     public void save(List<Task> tasks) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (Task task : tasks) {
-                String taskLine = task.getId() + "|" + task.isCompleted() + "|" + task.getTitle();
-                writer.write(taskLine);
-                writer.newLine();
+        Path target = file.toPath().toAbsolutePath();
+        Path temp = Files.createTempFile(target.getParent(), "tasks-", ".tmp");
+        try {
+            try (BufferedWriter writer =
+                         new BufferedWriter(new FileWriter(temp.toFile()))) {
+                for (Task task : tasks) {
+                    String taskLine = task.getId() + "|"
+                            + task.isCompleted() + "|" + task.getTitle();
+                    writer.write(taskLine);
+                    writer.newLine();
+                }
             }
+            // 内层 try 结束，writer 已关闭
+            Files.move(temp, target, StandardCopyOption.ATOMIC_MOVE);
+        } finally {
+            Files.deleteIfExists(temp);
         }
     }
 
